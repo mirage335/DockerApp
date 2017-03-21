@@ -1,5 +1,22 @@
 #!/usr/bin/env bash
 
+# Copyright (C) 2017 mirage335
+
+# This file is part of DockerApp.
+
+# DockerApp is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# DockerApp is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with DockerApp.  If not, see <http://www.gnu.org/licenses/>.
+
 #####Utilities.
 #Retrieves absolute path of current script, while maintaining symlinks, even when "./" would translate with "readlink -f" into something disregarding symlinked components in $PWD.
 #However, will dereference symlinks IF the script location itself is a symlink. This is to allow symlinking to scripts to function normally.
@@ -141,6 +158,33 @@ _validateRequest() {
 }
 
 
+#####Basic Variable Management
+
+
+_deriveBaseImageContainerNames() {
+	
+	#Sub-object Names
+	export baseObjectName=$(echo "$objectName" | cut -s -d\- -f3)
+	export imageObjectName=$(echo "$objectName" | cut -s -d\- -f2)
+	export containerObjectName=$(echo "$objectName" | cut -d\- -f1)
+	
+	if ! echo "$baseObjectName" | grep ':' >/dev/null 2>&1
+	then
+		baseObjectName="$baseObjectName"":latest"
+	fi
+	
+	if ! echo "$imageObjectName" | grep ':' >/dev/null 2>&1
+	then
+		imageObjectName="$imageObjectName"":latest"
+	fi
+	
+	imageObjectNameSane=$(echo "$imageObjectName" | tr ':/' '__' | tr -dc 'a-zA-Z0-9_')
+	
+	containerObjectName="$containerObjectName""_""$imageObjectNameSane"
+	
+}
+
+
 #####Global variables.
 export sessionid=$(_uid)
 export scriptAbsoluteLocation=$(_getScriptAbsoluteLocation)
@@ -164,9 +208,7 @@ export objectDir="$scriptAbsoluteFolder"
 export objectName=$(basename "$objectDir")
 
 #Sub-object Names
-export baseObjectName=$(echo "$objectName" | cut -s -d\- -f3)
-export imageObjectName=$(echo "$objectName" | cut -s -d\- -f2)
-export containerObjectName=$(echo "$objectName" | cut -d\- -f1)
+_deriveBaseImageContainerNames
 
 
 #####Local Environment Management
@@ -288,26 +330,26 @@ _build_base_scratch() {
 	
 	echo -e -n '\E[1;32;46m Searching, base...	\E[0m'
 	
-	[[ "$(docker images -q "$baseObjectName":latest 2> /dev/null)" != "" ]] && echo -e '\E[1;33;41m EXISTS \E[0m' && return
+	[[ "$(docker images -q "$baseObjectName" 2> /dev/null)" != "" ]] && echo -e '\E[1;33;41m EXISTS \E[0m' && return
 	echo "PASS"
 	
 	echo -e -n '\E[1;32;46m Building '"$baseObjectName"' base...	\E[0m'
 	cd "$objectDir"
-	tar cv --files-from /dev/null | docker import - "$baseObjectName":latest 2> /dev/null > "$logTmp"/buildBase
+	tar cv --files-from /dev/null | docker import - "$baseObjectName" 2> /dev/null > "$logTmp"/buildBase
 	cd "$scriptAbsoluteFolder"
 	
-	[[ "$(docker images -q "$baseObjectName":latest 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
+	[[ "$(docker images -q "$baseObjectName" 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
 	echo "PASS"
 	
 }
+
 
 _build_base() {
 	echo -e -n '\E[1;32;46m Validating request '"$baseObjectName"'...	\E[0m'
 	
 	[[ "$baseObjectName" == "" ]] && echo -e '\E[1;33;41m BLANK \E[0m' && return 1
 	
-	[[ "$baseObjectName" == "scratch" ]] && echo "PASS" && _build_base_scratch && return
-	
+	[[ "$baseObjectName" == "scratch:latest" ]] && echo "PASS" && _build_base_scratch && return
 	
 	
 	echo -e '\E[1;33;41m Warning: no local build instructions. \E[0m'
@@ -320,9 +362,10 @@ _build_base() {
 _build_image() {
 	_validateRequest "$imageObjectName" || return 1
 	
+	
 	echo -e -n '\E[1;32;46m Searching, image...	\E[0m'
 	
-	[[ "$(docker images -q "$imageObjectName":latest 2> /dev/null)" != "" ]] && echo -e '\E[1;33;41m EXISTS \E[0m' && return
+	[[ "$(docker images -q "$imageObjectName" 2> /dev/null)" != "" ]] && echo -e '\E[1;33;41m EXISTS \E[0m' && return
 	echo "PASS"
 	
 	echo -e -n '\E[1;32;46m Building '"$imageObjectName"' image...	\E[0m'
@@ -330,7 +373,7 @@ _build_image() {
 	docker build --rm --tag "$imageObjectName" . 2> /dev/null > "$logTmp"/buildImage
 	cd "$scriptAbsoluteFolder"
 	
-	[[ "$(docker images -q "$imageObjectName":latest 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
+	[[ "$(docker images -q "$imageObjectName" 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
 	echo "PASS"
 	
 	
@@ -342,16 +385,16 @@ _build_container() {
 	echo -e -n '\E[1;32;46m Searching, containers...	\E[0m'
 	
 	local dockerContainerID
-	dockerContainerID=$(docker ps -a -q --filter name='^/'"$containerObjectName""_""$imageObjectName"'$')
+	dockerContainerID=$(docker ps -a -q --filter name='^/'"$containerObjectName"'$')
 	[[ "$dockerContainerID" != "" ]] && echo -e '\E[1;33;41m EXISTS \E[0m' && return
 	echo "PASS"
 	
 	echo -e -n '\E[1;32;46m Building '"$containerObjectName"' container...	\E[0m'
 	cd "$objectDir"
-	docker create -t -i --name "$containerObjectName"_"$imageObjectName" "$imageObjectName" 2> /dev/null > "$logTmp"/buildContainer
+	docker create -t -i --name "$containerObjectName" "$imageObjectName" 2> /dev/null > "$logTmp"/buildContainer
 	cd "$scriptAbsoluteFolder"
 	
-	dockerContainerID=$(docker ps -a -q --filter name='^/'"$containerObjectName""_""$imageObjectName"'$')
+	dockerContainerID=$(docker ps -a -q --filter name='^/'"$containerObjectName"'$')
 	[[ "$dockerContainerID" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
 	echo "PASS"
 	
@@ -391,11 +434,6 @@ _collect() {
 	
 	if [[ -e "$1"/dockerfile ]] && [[ -d "$1" ]]
 	then
-		#Override functions with external definitions from a separate file if available.
-		if [[ -e "$1"/ops ]]
-		then 
-			. "$1"/ops
-		fi
 		
 		#Object Dir
 		export objectDir=$(_getAbsoluteLocation "$1")
@@ -403,10 +441,14 @@ _collect() {
 		#Object Name
 		export objectName=$(basename "$objectDir")
 
-		#Sub-object Names
-		export baseObjectName=$(echo "$objectName" | cut -s -d\- -f3)
-		export imageObjectName=$(echo "$objectName" | cut -s -d\- -f2)
-		export containerObjectName=$(echo "$objectName" | cut -d\- -f1)
+		_deriveBaseImageContainerNames
+		
+		#Override functions and variables with external definitions from a separate file if available.
+		if [[ -e "$1"/ops ]]
+		then 
+			. "$1"/ops
+		fi
+		
 		
 		return
 	fi
@@ -417,31 +459,56 @@ _collect() {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	_stop
 	
 }
 
 _commit() {
 	
-	docker commit "$containerObjectName"_"$imageObjectName" "$imageObjectName"
+	docker commit "$containerObjectName" "$imageObjectName"
 	
 }
 
 _launch() {
 	
-	docker start -ia "$containerObjectName"_"$imageObjectName"
+	docker start -ia "$containerObjectName"
+	
+}
+
+_attach() {
+	
+	docker attach "$containerObjectName"
 	
 }
 
 _on() {
+	_start
 	
-	docker start "$containerObjectName"_"$imageObjectName" > "$logTmp"/on
+	docker start "$containerObjectName" > "$logTmp"/log_on
+	
+	#_preserveLog
+	
+	_stop
 	
 }
 
 _off() {
+	_start
 	
-	docker stop -t 10 "$containerObjectName"_"$imageObjectName" > "$logTmp"/off
+	docker stop -t 10 "$containerObjectName" > "$logTmp"/log_off
+	
+	#_preserveLog
+	
+	_stop
 	
 }
 
