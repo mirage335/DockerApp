@@ -4,26 +4,26 @@ See license.txt for DockerApp license conditions.
 
 Docker base/image/container management infrastructure, intended for standalone applications.
 
-#Usage
+# Usage
 
 ./launch ./dockerfiles/unimportant-hello-scratch
 
-#Design
+# Design
 
 Complex structure of shell script may seem excessive, but emphasizes scalability to more powerful solutions.
 
-#Features
+# Features
 
 * Override internal functionality with 'ops' script.
 * Resources (ie. images/containers) automatically given unique names derived from application directory.
 * Symlink compatibility. Both launch and anchor scripts may be called as a symlink at ~/bin/appName .
 
-#Ratings
+# Ratings
 
 * Application directory naming must follow the naming convention container[-image][-base] .
 * Unique names are required for all application container/image combinations, even if different bases are used.
 
-#FutureWork
+# FutureWork
 
 * Backup of working container to image stored in application directory. Completion of load/save/modify image functions.
 * Debian base build support.
@@ -32,7 +32,7 @@ Complex structure of shell script may seem excessive, but emphasizes scalability
 
 
 
-#Copyright
+# Copyright
 This file is part of DockerApp.
 
 DockerApp is free software: you can redistribute it and/or modify
