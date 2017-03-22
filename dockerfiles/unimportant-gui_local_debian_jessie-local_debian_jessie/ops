@@ -25,7 +25,14 @@ _run() {
 	#docker run -it --name "$containerObjectName"_"$sessionid" --rm "$imageObjectName" "$@"
 	#docker run -it -e LOCAL_USER_ID=`id -u $USER` myimage
 	
-	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm "$imageObjectName" "$@"
+	#http://wiki.ros.org/docker/Tutorials/GUI
+	
+	XSOCK=/tmp/.X11-unix
+	XAUTH=/tmp/.docker.xauth."$sessionid"
+	touch $XAUTH
+	xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+	
+	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" "$imageObjectName" "$@"
 	
 }
 
