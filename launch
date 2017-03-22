@@ -467,9 +467,10 @@ _build() {
 	_stop
 }
 
-_check() {
+_quick() {
 	
-	#Build container if necessary, but do not build base/image.
+	#Build container and image if necessary, but do not build base.
+	_build_image >/dev/null 2>&1
 	_build_container >/dev/null 2>&1
 	
 	local dockerContainerID
@@ -581,9 +582,7 @@ _main() {
 	
 	#"$scriptAbsoluteLocation" _setup "$@" > "$logTmp"/setup
 	
-	_check
-	
-	_start
+	_quick
 	
 	_launch
 	
