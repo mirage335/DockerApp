@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+
+export mkimageAbsoluteLocaton="$scriptAbsoluteFolder"/../../../docker/contrib/mkimage.sh
+export mkimageAbsoluteDirectory=$(_getAbsoluteFolder "$mkimageAbsoluteLocaton")
+
+#export objectName="unimportant-hello:mirage335/debian-mirage335/debian:jessie"
+export objectName="unimportant-hello:local_debian_jessie-local/debian:jessie"
+
+_deriveBaseImageContainerNames
+
+_build_base_mkimage() {
+	echo -e -n '\E[1;32;46m Searching, base...	\E[0m'
+	
+	[[ "$(docker images -q "$baseObjectName" 2> /dev/null)" != "" ]] && echo -e '\E[1;33;41m EXISTS \E[0m' && return
+	echo "PASS"
+	
+	local mkimageDistro
+	local mkimageVersion
+	
+	mkimageDistro=$(echo "$baseObjectName" | cut -d \/ -f 2 | cut -d \: -f 1)
+	mkimageVersion=$(echo "$baseObjectName" | cut -d \/ -f 2 | cut -d \: -f 2)
+	
+	cd "$mkimageAbsoluteDirectory"
+	
+	[[ $mkimageDistro == "debian" ]] ; sudo  -n ./mkimage.sh -t "$baseObjectName" -d . debootstrap --variant=minbase --components=main --include=inetutils-ping,iproute "$mkimageVersion" http://http.debian.net/debian 2> "$logTmp"/mkimageErr > "$logTmp"/mkimageOut
+	
+	cd "$scriptAbsoluteFolder"
+}
+
+_build_base_debianjessie() {
+	_build_base_mkimage
+}
+
+
+_build_base() {
+	echo -e -n '\E[1;32;46m Validating request '"$baseObjectName"'...	\E[0m'
+	
+	[[ "$baseObjectName" == "" ]] && echo -e '\E[1;33;41m BLANK \E[0m' && return 1
+	
+	[[ "$baseObjectName" == "local/debian:jessie" ]] && echo "PASS" && _build_base_debianjessie && return
+	
+	
+	#No local build instructons found, will rely on upstream provider.
+	echo -e '\E[1;33;41m WARN \E[0m'
+	return 1
+	
+	
+	
+}
+
+
+
+
+
