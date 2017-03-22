@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
 
-export mkimageAbsoluteLocaton="$scriptAbsoluteFolder"/../../../docker/contrib/mkimage.sh
-export mkimageAbsoluteDirectory=$(_getAbsoluteFolder "$mkimageAbsoluteLocaton")
-
 #export objectName="unimportant-hello:mirage335/debian-mirage335/debian:jessie"
 export objectName="unimportant-shell:local_debian_jessie-local/debian:jessie"
 

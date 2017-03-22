@@ -25,6 +25,11 @@ Complex structure of shell script may seem excessive, but emphasizes scalability
 * Characters not allowed by filename (ie. :/) may be used through an accompanying "ops" script. Consider unimportant-hello:mirage335_debian_jessie-mirage335/debian:jessie .
 * Specifying identical base/image names should result in the container being directly based, without an intermediate image. Doing so may complicate committng and backing up container changes.
 
+# SAFETY
+
+* Despite the _safeRMR wrapper, incidents are still theoretically possible, and commands like "rm -rf" are ultimately used. Be careful.
+* Resources called by this script (ie. mkimage) are untrusted. Carefully verify these scripts before using on production systems.
+
 # FutureWork
 
 * Backup of working container to image stored in application directory. Completion of load/save/modify image functions.
