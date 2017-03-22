@@ -330,10 +330,15 @@ _setup() {
 
 ## Docker Ops
 
-#Removes just the container and image. Intended to enable dockerfile changes, restoration of saved images, etc. Beware this is could be mildly dangerous if given bad information.
+#Removes just the container. Intended to allow rebasing from a modified image. Beware this could be mildly dangerous if given bad information.
 _clear() {
 	 docker rm $(docker ps -a -q --filter name='^/'"$containerObjectName"'$')
-	 docker rmi --force $(docker images -q "$imageObjectName")
+}
+
+#Removes just the container and image. Intended to enable dockerfile changes, restoration of saved images, etc. Beware this could be mildly dangerous if given bad information.
+_clearImage() {
+	_clear
+	docker rmi --force $(docker images -q "$imageObjectName")
 }
 
 #DANGER: Really removes all docker images/containers.
@@ -368,7 +373,7 @@ _build_base_mkimage() {
 	
 	
 	
-	[[ "$(docker images -q "$baseObjectName" 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
+	[[ "$(docker images -q "$baseObjectName" 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && echo -e -n '\E[1;32;46m *****BREAKPOINT, press any key. '"$1"'...	\E[0m' && read && return 1
 	echo "PASS"
 	
 }
@@ -390,7 +395,7 @@ _build_base_scratch() {
 	tar cv --files-from /dev/null | docker import - "$baseObjectName" 2> /dev/null > "$logTmp"/buildBase
 	cd "$scriptAbsoluteFolder"
 	
-	[[ "$(docker images -q "$baseObjectName" 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
+	[[ "$(docker images -q "$baseObjectName" 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && echo -e -n '\E[1;32;46m *****BREAKPOINT, press any key. '"$1"'...	\E[0m' && read && return 1
 	echo "PASS"
 	
 }
@@ -428,7 +433,7 @@ _build_image() {
 	docker build --rm --tag "$imageObjectName" . 2> /dev/null > "$logTmp"/buildImage
 	cd "$scriptAbsoluteFolder"
 	
-	[[ "$(docker images -q "$imageObjectName" 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
+	[[ "$(docker images -q "$imageObjectName" 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && echo -e -n '\E[1;32;46m *****BREAKPOINT, press any key. '"$1"'...	\E[0m' && read && return 1
 	echo "PASS"
 	
 	
@@ -450,7 +455,7 @@ _build_container() {
 	cd "$scriptAbsoluteFolder"
 	
 	dockerContainerID=$(docker ps -a -q --filter name='^/'"$containerObjectName"'$')
-	[[ "$dockerContainerID" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
+	[[ "$dockerContainerID" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && echo -e -n '\E[1;32;46m *****BREAKPOINT, press any key. '"$1"'...	\E[0m' && read && return 1
 	echo "PASS"
 	
 	
