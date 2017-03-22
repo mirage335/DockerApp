@@ -532,7 +532,7 @@ _commit() {
 
 _run() {
 	
-	docker run -it "$imageObjectName"
+	docker run -it --name "$containerObjectName"_"$sessionid" --rm "$imageObjectName"
 	
 }
 
