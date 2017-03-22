@@ -6,9 +6,11 @@ Docker base/image/container management infrastructure, intended for standalone a
 
 # Usage
 
-./launch _setup ./dockerfiles/unimportant-hello-scratch
+cd ./dockerfiles/unimportant-hello-scratch
+./anchor _setup
+./anchor
+./anchor /hello
 
-./launch ./dockerfiles/unimportant-hello-scratch
 
 # Design
 

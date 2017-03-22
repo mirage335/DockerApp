@@ -1,2 +1,3 @@
 FROM local/debian:jessie
-CMD ["/bin/bash"] 
+ADD RunApp /
+CMD ["/RunApp"] 
