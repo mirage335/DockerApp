@@ -6,9 +6,9 @@ export objectName="unimportant-shell:local_debian_jessie-local/debian:jessie"
 
 _deriveBaseImageContainerNames
 
-_launch() {
-	_run
-}
+#_launch() {
+#	_run "$@"
+#}
 
 
 
