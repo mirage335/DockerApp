@@ -20,6 +20,7 @@ _setup() {
 	_stop
 }
 
+# "$1" == shared project directory
 _run() {
 	
 	#docker run -it --name "$containerObjectName"_"$sessionid" --rm "$imageObjectName" "$@"
@@ -32,7 +33,11 @@ _run() {
 	touch $XAUTH
 	xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 	
-	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" "$imageObjectName" "$@"
+	sharedProjectDir=$(_getAbsoluteLocation "$1")
+	shift
+	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$HOME"/Downloads:/home/user/Downloads:rw -v "$sharedProjectDir":/home/user/project:rw "$imageObjectName" "$@"
+	
+	#docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$HOME"/Downloads:/home/user/Downloads:rw "$imageObjectName" "$@"
 	
 }
 
