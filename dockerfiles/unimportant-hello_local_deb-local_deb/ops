@@ -4,3 +4,8 @@
 export objectName="unimportant-hello:local_debian_jessie-local/debian:jessie"
 
 _deriveBaseImageContainerNames
+
+_launch() {
+	_run
+}
+

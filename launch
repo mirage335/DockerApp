@@ -468,6 +468,10 @@ _build() {
 }
 
 _check() {
+	
+	#Build container if necessary, but do not build base/image.
+	_build_container >/dev/null 2>&1
+	
 	local dockerContainerID
 	dockerContainerID=$(docker ps -a -q --filter name='^/'"$containerObjectName"'$')
 	
@@ -516,15 +520,6 @@ _collect() {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	_stop
 	
 }
@@ -532,6 +527,12 @@ _collect() {
 _commit() {
 	
 	docker commit "$containerObjectName" "$imageObjectName"
+	
+}
+
+_run() {
+	
+	docker run -it "$imageObjectName"
 	
 }
 
