@@ -330,6 +330,11 @@ _setup() {
 
 ## Docker Ops
 
+#Removes just the container and image. Intended to enable dockerfile changes, restoration of saved images, etc. Beware this is could be mildly dangerous if given bad information.
+_clear() {
+	 docker rm $(docker ps -a -q --filter name='^/'"$containerObjectName"'$')
+	 docker rmi --force $(docker images -q "$imageObjectName")
+}
 
 #DANGER: Really removes all docker images/containers.
 _clearAll() {

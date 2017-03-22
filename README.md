@@ -35,8 +35,6 @@ Complex structure of shell script may seem excessive, but emphasizes scalability
 # FutureWork
 
 * Backup of working container to image stored in application directory. Completion of load/save/modify image functions.
-* Debian base build support.
-* Single-container clear command.
 
 
 
