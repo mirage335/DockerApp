@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+
+#export objectName="unimportant-hello:mirage335/debian-mirage335/debian:jessie"
+export objectName="unimportant-gui:local_debian_jessie-local/debian:jessie"
+
+_deriveBaseImageContainerNames
+
+_run() {
+	
+	#docker run -it --name "$containerObjectName"_"$sessionid" --rm "$imageObjectName" "$@"
+	#docker run -it -e LOCAL_USER_ID=`id -u $USER` myimage
+	
+	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm "$imageObjectName" "$@"
+	
+}
+
+
+_launch() {
+	_run "$@"
+}
+
+
+
+
+
