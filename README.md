@@ -23,6 +23,7 @@ Complex structure of shell script may seem excessive, but emphasizes scalability
 * Application directory naming must follow the naming convention container[-image][-base] .
 * Unique names are required for all application container/image combinations, even if different bases are used.
 * Characters not allowed by filename (ie. :/) may be used through an accompanying "ops" script. Consider unimportant-hello:mirage335_debian_jessie-mirage335/debian:jessie .
+* Specifying identical base/image names should result in the container being directly based, without an intermediate image. Doing so may complicate committng and backing up container changes.
 
 # FutureWork
 
