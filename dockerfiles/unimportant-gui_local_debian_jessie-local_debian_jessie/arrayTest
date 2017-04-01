@@ -1,8 +1,0 @@
-#!/bin/bash
-
-local args
-args=()
-for i in "$@"; do
-    args+=("$i")
-done
-echo "${args[@]}"
