@@ -36,7 +36,6 @@ _getScriptAbsoluteLocation() {
 	absoluteLocation=$(readlink -f "$absoluteLocation")
 	absoluteLocation=$(realpath -L "$absoluteLocation")
 	fi
-	
 	echo $absoluteLocation
 }
 
@@ -49,6 +48,12 @@ _getScriptAbsoluteFolder() {
 #Retrieves absolute path of parameter, while maintaining symlinks, even when "./" would translate with "readlink -f" into something disregarding symlinked components in $PWD.
 #Suitable for finding absolute paths, when it is desirable not to interfere with symlink specified folder structure.
 _getAbsoluteLocation() {
+	if [[ "$1" == "" ]]
+	then
+		echo
+		return
+	fi
+	
 	local absoluteLocation
 	if [[ (-e $PWD\/$1) && ($1 != "") ]] && [[ "$1" != "/"* ]]
 			then
