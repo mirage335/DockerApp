@@ -2,6 +2,6 @@
 
 echo PASS
 
-echo "$@"
+ls -l "$@"
 
 xeyes
