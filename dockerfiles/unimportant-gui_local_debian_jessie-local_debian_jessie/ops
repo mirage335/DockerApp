@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 
-#export objectName="unimportant-hello:mirage335/debian-mirage335/debian:jessie"
 export objectName="unimportant-gui:local_debian_jessie-local/debian:jessie"
 
 _deriveBaseImageContainerNames
@@ -20,7 +19,7 @@ _setup() {
 	_stop
 }
 
-# "$1" == shared project directory
+
 _run() {
 	
 	#docker run -it --name "$containerObjectName"_"$sessionid" --rm "$imageObjectName" "$@"
@@ -33,11 +32,32 @@ _run() {
 	touch $XAUTH
 	xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 	
-	sharedProjectDir=$(_getAbsoluteLocation "$1")
-	shift
-	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$HOME"/Downloads:/home/user/Downloads:rw -v "$sharedProjectDir":/home/user/project:rw "$imageObjectName" "$@"
+	sharedGuestProjectDir="/home/user/project"
 	
-	#docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$HOME"/Downloads:/home/user/Downloads:rw "$imageObjectName" "$@"
+	sharedHostProjectDir=$(_searchBaseDir "$@")
+	
+	if [[ "$sharedHostProjectDir" == "" ]]
+	then
+		sharedProjectDir="$safeTmp"/shared
+		mkdir -p "$sharedHostProjectDir"
+	fi
+	
+	
+	#http://stackoverflow.com/questions/15420790/create-array-in-loop-from-number-of-arguments
+	local processedArgs
+	local currentArg
+	local currentResult
+	processedArgs=()
+	for currentArg in "$@"
+	do
+		currentResult=$(_localDir "$currentArg" "$sharedHostProjectDir" "$sharedGuestProjectDir")
+		processedArgs+=("$currentResult")
+	done
+	
+	
+	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$HOME"/Downloads:/home/user/Downloads:rw -v "$sharedHostProjectDir":"$sharedGuestProjectDir":rw "$imageObjectName" /bin/bash "${processedArgs[@]}"
+	
+	
 	
 }
 

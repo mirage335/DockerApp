@@ -1,3 +1,0 @@
-FROM local/debian:jessie
-ADD RunApp /
-CMD ["/RunApp"] 

@@ -23,19 +23,20 @@
 #Suitable for allowing scripts to find other scripts they depend on. May look like an ugly hack, but it has proven reliable over the years.
 _getScriptAbsoluteLocation() {
 	local absoluteLocation
-	if [[ (-e $PWD\/$0) && ($0 != "") ]]
+	if [[ (-e $PWD\/$0) && ($0 != "") ]] && [[ "$1" != "/"* ]]
 			then
 	absoluteLocation="$PWD"\/"$0"
-	absoluteLocation=$(realpath -s "$absoluteLocation")
+	absoluteLocation=$(realpath -L -s "$absoluteLocation")
 			else
-	absoluteLocation="$0"
+	absoluteLocation=$(realpath -L "$0")
 	fi
 
 	if [[ -h "$absoluteLocation" ]]
 			then
 	absoluteLocation=$(readlink -f "$absoluteLocation")
+	absoluteLocation=$(realpath -L "$absoluteLocation")
 	fi
-
+	
 	echo $absoluteLocation
 }
 
@@ -49,12 +50,12 @@ _getScriptAbsoluteFolder() {
 #Suitable for finding absolute paths, when it is desirable not to interfere with symlink specified folder structure.
 _getAbsoluteLocation() {
 	local absoluteLocation
-	if [[ (-e $PWD\/$1) && ($1 != "") ]]
+	if [[ (-e $PWD\/$1) && ($1 != "") ]] && [[ "$1" != "/"* ]]
 			then
 	absoluteLocation="$PWD"\/"$1"
-	absoluteLocation=$(realpath -s "$absoluteLocation")
+	absoluteLocation=$(realpath -L -s "$absoluteLocation")
 			else
-	absoluteLocation="$1"
+	absoluteLocation=$(realpath -L "$1")
 	fi
 	echo $absoluteLocation
 }
@@ -155,6 +156,94 @@ _validateRequest() {
 	[[ "$1" == "" ]] && echo -e '\E[1;33;41m BLANK \E[0m' && return 1
 	echo "PASS"
 	return
+}
+
+#Reports the highest-level directory containing all files in given parameter set.
+#"$@" == parameters to search
+_searchBaseDir() {
+	local baseDir
+	local newDir
+	
+	baseDir=""
+	
+	for currentArg in "$@"
+	do
+		if [[ ! -e "$currentArg" ]]
+		then
+			continue
+		fi
+		
+		if [[ "$baseDir" == "" ]]
+		then
+			baseDir=$(_findDir "$currentArg")
+		fi
+		
+		for subArg in "$@"
+		do
+			if [[ ! -e "$subArg" ]]
+			then
+				continue
+			fi
+			
+			newDir=$(_findDir "$subArg")
+			
+			while [[ "$newDir" != "$baseDir"* ]]
+			do
+				baseDir=$(_findDir "$baseDir"/..)
+				
+				if [[ "$baseDir" == "/" ]]
+				then
+					break
+				fi
+			done
+			
+		done
+		
+		
+		
+		
+	done
+	
+	echo "$baseDir"
+}
+
+#Reports either the directory provided, or the directory of the file provided.
+_findDir() {
+	local dirIn=$(_getAbsoluteLocation "$1")
+	dirInLogical=$(realpath -L -s "$dirIn")
+	
+	if [[ -d "$dirInLogical" ]]
+	then
+		echo "$dirInLogical"
+		return
+	fi
+	
+	echo $(_getAbsoluteFolder "$dirInLogical")
+	return
+	
+}
+
+
+#Converts to relative path, if provided a file parameter.
+#"$1" == parameter to search
+#"$2" == sharedProjectDir
+#"$3" == sharedGuestProjectDir (optional)
+_localDir() {
+	if [[ ! -e "$2" ]]
+	then
+		echo "$1"
+		return
+	fi
+	
+	if [[ ! -e "$1" ]]
+	then
+		echo "$1"
+		return
+	fi
+	
+	[[ "$3" != "" ]] && echo -n "$3"/
+	realpath -L -s --relative-to="$2" "$1"
+	
 }
 
 
