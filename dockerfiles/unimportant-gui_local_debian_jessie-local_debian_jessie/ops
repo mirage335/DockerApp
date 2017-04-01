@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export objectName="marlinbuilder-marlinbuilder:local_debian_jessie-local/debian:jessie"
+export objectName="unimportant-gui:local_debian_jessie-local/debian:jessie"
 
 _deriveBaseImageContainerNames
 
