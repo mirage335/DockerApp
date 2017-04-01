@@ -6,6 +6,7 @@ Docker base/image/container management infrastructure, intended for standalone a
 
 # Usage
 
+```
 cd ./dockerfiles/unimportant-hello-scratch
 ./anchor _setup
 ./anchor
@@ -16,7 +17,7 @@ cd ./dockerfiles/unimportant-gui_local_debian_jessie-local_debian_jessie
 ./anchor ./test/testfile ./test/testfile
 #Should see xeyes launched from the script in the "./test" directory automatically shared with the container.
 cd ..
-
+```
 
 # Design
 
