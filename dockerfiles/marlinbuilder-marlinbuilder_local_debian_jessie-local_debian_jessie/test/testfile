@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo PASS
+
+ls -l "$@"
+
+xeyes
