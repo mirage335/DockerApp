@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #export objectName="marlinbuilder-marlinbuilder:local_debian_jessie-local/debian:jessie"
-export objectName="marlinbuilder-marlinbuilder:local_debian_jessie-gui:local_debian_jessie"
+export objectName="marlinbuilder-marlinbuilder:gui_local_debian_jessie-gui:local_debian_jessie"
 
 _deriveBaseImageContainerNames
 
@@ -12,8 +12,8 @@ _setup() {
 	
 	"$scriptAbsoluteLocation" _build "$@"
 	
-	echo -e -n '\E[1;33;41m *****BREAKPOINT, press any key... \E[0m'
-	read
+	#echo -e -n '\E[1;33;41m *****BREAKPOINT, press any key... \E[0m'
+	#read
 	#echo
 	
 	_stop

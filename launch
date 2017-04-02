@@ -344,6 +344,8 @@ _stop() {
 	_safeRMR "$safeTmp"
 	_safeRMR "$shortTmp"
 	
+	rm ./importLog >/dev/null 2>&1
+	
 	#Broken.
 	if [[ "$1" != "" ]]
 	then
@@ -423,6 +425,16 @@ _setup() {
 
 
 ## Docker Ops
+_parseDockerfileElement() {
+	local dockerfileElement
+	dockerfileElement=$(grep "$1" ./dockerfile | cut -d\  -f2- | tr -d '[]"')
+	export dockerfile_"$1"="$dockerfileElement"
+}
+
+_parseDockerfile() {
+	_parseDockerfileElement ENTRYPOINT
+	_parseDockerfileElement CMD
+}
 
 #Removes just the container. Intended to allow rebasing from a modified image. Beware this could be mildly dangerous if given bad information.
 _clear() {
@@ -442,6 +454,35 @@ _clearAll() {
 	docker rmi --force $(docker images -q)
 	echo y | docker system prune
 	
+}
+
+_commit() {
+	true
+}
+
+#NOT recommended. NOT well tested. Import filesystem as Docker image.
+_import() {
+	
+	docker import "$containerObjectName".dcf >importLog 2>&1
+	rm ./importLog >/dev/null 2>&1
+	
+}
+
+#NOT recommended. NOT well tested. Export Docker Container Filesystem. Will be restored as an image, NOT a container, resulting in operations equivalent to commit/import.
+_export() {
+	docker export $(docker ps -a -q --filter name='^/'"$containerObjectName"'$') > "$containerObjectName".dcf
+}
+
+#Save Docker App Image.
+_save() {
+	#docker save $(docker images -q "$imageObjectName") > "$imageObjectNameSane".dai
+	docker save "$imageObjectName" > "$imageObjectNameSane".dai
+}
+
+#Load image, without any specific naming besides the uid. Recommend "_clearImage" first.
+_load() {
+	#docker load < *.dai
+	docker load < "$imageObjectNameSane".dai
 }
 
 
@@ -545,7 +586,7 @@ _build_container() {
 	
 	echo -e -n '\E[1;32;46m Building '"$containerObjectName"' container...	\E[0m'
 	cd "$objectDir"
-	docker create -t -i --name "$containerObjectName" "$imageObjectName" 2> /dev/null > "$logTmp"/buildContainer
+	docker create -t -i --name "$containerObjectName" "$imageObjectName" 2> "$logTmp"/buildContainer > "$logTmp"/buildContainer
 	cd "$scriptAbsoluteFolder"
 	
 	dockerContainerID=$(docker ps -a -q --filter name='^/'"$containerObjectName"'$')
@@ -560,9 +601,12 @@ _build() {
 	
 	_collect "$@" 
 	
+	#Load prebuilt image if available and not already installed.
+	[[ "$(docker images -q "$imageObjectName" 2> /dev/null)" != "" ]] || _load
 	
+	#Build base only if image is not available.
+	[[ "$(docker images -q "$imageObjectName" 2> /dev/null)" != "" ]] || _build_base
 	
-	_build_base
 	_build_image
 	_build_container
 	
