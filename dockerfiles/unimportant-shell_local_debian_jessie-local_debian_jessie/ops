@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 
-#export objectName="unimportant-hello:mirage335/debian-mirage335/debian:jessie"
 export objectName="unimportant-shell:local_debian_jessie-local/debian:jessie"
 
 _deriveBaseImageContainerNames
 
-#_launch() {
+#_enter() {
 #	_run "$@"
 #}
 

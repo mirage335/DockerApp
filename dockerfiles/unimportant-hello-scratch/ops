@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-#_launch() {
+#_enter() {
 #	_run "$@"
 #}
