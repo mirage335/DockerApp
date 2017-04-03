@@ -371,6 +371,7 @@ _stop() {
 	_safeRMR "$safeTmp"
 	_safeRMR "$shortTmp"
 	
+	rm /tmp/.docker.xauth."$sessionid" >/dev/null 2>&1
 	rm ./importLog >/dev/null 2>&1
 	
 	#Broken.
@@ -754,13 +755,20 @@ _checkBaseDirRemote() {
 	
 }
 
+_runExec() {
+	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$HOME"/Downloads:/home/user/Downloads:rw -v "$sharedHostProjectDir":"$sharedGuestProjectDir":rw "$imageObjectName" "$@"
+}
+
 _run() {
+	#Simple alternative
+	#docker run -it --name "$containerObjectName"_"$sessionid" --rm "$imageObjectName" "$@"
+	
 	#http://wiki.ros.org/docker/Tutorials/GUI
 	
 	_prepare
 	
-	XSOCK=/tmp/.X11-unix
-	XAUTH=/tmp/.docker.xauth."$sessionid"
+	export XSOCK=/tmp/.X11-unix
+	export XAUTH=/tmp/.docker.xauth."$sessionid"
 	touch $XAUTH
 	xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 	
@@ -785,11 +793,12 @@ _run() {
 		processedArgs+=("$currentResult")
 	done
 	
-	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$HOME"/Downloads:/home/user/Downloads:rw -v "$sharedHostProjectDir":"$sharedGuestProjectDir":rw "$imageObjectName" "${processedArgs[@]}"
+	export sharedHostProjectDir
+	export sharedProjectDir
 	
+	_runExec "${processedArgs[@]}"
 	
-	
-	#docker run -it --name "$containerObjectName"_"$sessionid" --rm "$imageObjectName" "$@"
+	rm /tmp/.docker.xauth."$sessionid"
 	
 }
 
