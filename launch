@@ -396,6 +396,7 @@ _test() {
 	# Check dependencies
 	_checkDep wget
 	_checkDep grep
+	_checkDep fgrep
 	_checkDep sed
 	_checkDep awk
 	_checkDep cut
@@ -719,41 +720,44 @@ _commit() {
 
 
 #Checks if file/directory exists on remote system. DockerApp version.
-export guestArgs=()
-export hostArgs=()
 _checkBaseDirRemote() {
 	
 	local currentArg
+	[[ ! -e "$safeTmp"/guestArgs ]] && touch "$safeTmp"/guestArgs
+	[[ ! -e "$safeTmp"/hostArgs ]] && touch "$safeTmp"/hostArgs
 	
-	for currentArg in "${guestArgs[@]}"
+	#http://stackoverflow.com/questions/10929453/read-a-file-line-by-line-assigning-the-value-to-a-variable
+	
+	while IFS='' read -r currentArg || [[ -n "$currentArg" ]]
 	do
 		if [[ "$currentArg" == "$1" ]]
 		then
 			return
 		fi
-	done
+	done < "$safeTmp"/guestArgs
 	
-	for currentArg in "${hostArgs[@]}"
+	while IFS='' read -r currentArg || [[ -n "$currentArg" ]]
 	do
 		if [[ "$currentArg" == "$1" ]]
 		then
 			return 1
 		fi
-	done
+	done < "$safeTmp"/hostArgs
 	
 	if docker run -it --name "$containerObjectName"_"$sessionid"_cr --rm "$imageObjectName" /bin/bash -c '[[ -e "'"$1"'" ]]' >/dev/null 2>&1
 	then
-		guestArgs+=("$1")
+		echo "$1" >> "$safeTmp"/guestArgs
 		return
 	fi
-	hostArgs+=("$1")
+	echo "$1" >> "$safeTmp"/hostArgs
 	return 1
 	
 }
 
 _run() {
-	
 	#http://wiki.ros.org/docker/Tutorials/GUI
+	
+	_prepare
 	
 	XSOCK=/tmp/.X11-unix
 	XAUTH=/tmp/.docker.xauth."$sessionid"
@@ -823,6 +827,12 @@ _off() {
 	
 }
 
+_enter() {
+	
+	_launch "$@"
+	
+}
+
 #Program entry point.
 _main() {
 	
@@ -836,7 +846,7 @@ _main() {
 	
 	_quick
 	
-	_launch "$@"
+	_enter "$@"
 	
 	#_preserveLog
 	

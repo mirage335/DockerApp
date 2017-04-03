@@ -6,9 +6,10 @@ export objectName="derivative-derivative:gui_local_debian_jessie-gui:local_debia
 _deriveBaseImageContainerNames
 
 
-#_launch() {
-#	_run "$@"
-#}
+_enter() {
+	_run "$@"
+	#_run /bin/bash "$@"
+}
 
 
 
