@@ -481,9 +481,14 @@ _save() {
 
 #Load image, without any specific naming besides the uid. Recommend "_clearImage" first.
 _load() {
+	echo -e -n '\E[1;32;46m Loading '"$imageObjectName"' image...	\E[0m'
+	
 	#docker load < *.dai
 	[[ -e "$imageObjectNameSane".dai ]] && docker load < "$imageObjectNameSane".dai >importLog 2>&1
 	rm ./importLog >/dev/null 2>&1
+	
+	[[ "$(docker images -q "$imageObjectName" 2> /dev/null)" == "" ]]  && echo -e '\E[1;33;41m FAIL \E[0m' && return 1
+	echo "PASS"
 }
 
 
