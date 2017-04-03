@@ -482,7 +482,8 @@ _save() {
 #Load image, without any specific naming besides the uid. Recommend "_clearImage" first.
 _load() {
 	#docker load < *.dai
-	docker load < "$imageObjectNameSane".dai
+	[[ -e "$imageObjectNameSane".dai ]] && docker load < "$imageObjectNameSane".dai >importLog 2>&1
+	rm ./importLog >/dev/null 2>&1
 }
 
 

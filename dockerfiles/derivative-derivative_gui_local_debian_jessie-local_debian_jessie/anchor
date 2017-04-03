@@ -30,6 +30,6 @@ _getScriptAbsoluteFolder() {
 
 ##### Script Call
 
-. "$(_getScriptAbsoluteFolder)"/launch "$@"
+. "$(_getScriptAbsoluteFolder)"/../../launch "$@"
 _main "$@"
 
