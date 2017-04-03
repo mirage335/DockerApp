@@ -21,9 +21,6 @@ _setup() {
 
 _run() {
 	
-	#docker run -it --name "$containerObjectName"_"$sessionid" --rm "$imageObjectName" "$@"
-	#docker run -it -e LOCAL_USER_ID=`id -u $USER` myimage
-	
 	#http://wiki.ros.org/docker/Tutorials/GUI
 	
 	XSOCK=/tmp/.X11-unix

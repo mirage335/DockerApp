@@ -14,7 +14,7 @@ cd ./dockerfiles/unimportant-hello-scratch
 cd ..
 
 cd ./dockerfiles/unimportant-gui_local_debian_jessie-local_debian_jessie
-./anchor ./test/testfile ./test/testfile
+./anchor _run /bin/bash ./test/testfile ./test/testfile
 #Should see xeyes launched from the script in the "./test" directory automatically shared with the container.
 cd ..
 ```

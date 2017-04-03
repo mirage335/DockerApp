@@ -1,5 +1,5 @@
 # Example
-./anchor ./test/testfile ./test/testfile
+./anchor _run /bin/bash ./test/testfile ./test/testfile
 
 # Cavets
 
