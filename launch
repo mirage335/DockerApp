@@ -717,15 +717,38 @@ _commit() {
 }
 
 
+
 #Checks if file/directory exists on remote system. DockerApp version.
+export guestArgs=()
+export hostArgs=()
 _checkBaseDirRemote() {
 	
+	local currentArg
+	
+	for currentArg in "${guestArgs[@]}"
+	do
+		if [[ "$currentArg" == "$1" ]]
+		then
+			return
+		fi
+	done
+	
+	for currentArg in "${hostArgs[@]}"
+	do
+		if [[ "$currentArg" == "$1" ]]
+		then
+			return 1
+		fi
+	done
 	
 	if docker run -it --name "$containerObjectName"_"$sessionid"_cr --rm "$imageObjectName" /bin/bash -c '[[ -e "'"$1"'" ]]' >/dev/null 2>&1
 	then
+		guestArgs+=("$1")
 		return
 	fi
+	hostArgs+=("$1")
 	return 1
+	
 }
 
 _run() {
@@ -757,7 +780,6 @@ _run() {
 		currentResult=$(_localDir "$currentArg" "$sharedHostProjectDir" "$sharedGuestProjectDir")
 		processedArgs+=("$currentResult")
 	done
-	
 	
 	docker run -it --name "$containerObjectName"_"$sessionid" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$HOME"/Downloads:/home/user/Downloads:rw -v "$sharedHostProjectDir":"$sharedGuestProjectDir":rw "$imageObjectName" "${processedArgs[@]}"
 	
