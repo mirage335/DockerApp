@@ -865,15 +865,15 @@ _main() {
 }
 
 #Override functions with external definitions from a separate file if available.
-if [[ -e "./ops" ]]
-then
-	. ./ops
-fi
+#if [[ -e "./ops" ]]
+#then
+#	. ./ops
+#fi
 
 #Override functions with external definitions from a separate file if available.
-if [[ -e "$guidanceDir"/ops ]]
+if [[ -e "$objectDir"/ops ]]
 then
-	. "$guidanceDir"/ops
+	. "$objectDir"/ops
 fi
 
 
