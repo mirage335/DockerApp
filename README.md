@@ -2,7 +2,7 @@ Copyright (C) 2017 mirage335
 See the end of the file for license conditions.
 See license.txt for DockerApp license conditions.
 
-Docker base/image/container management infrastructure, intended for standalone applications. See "unimportant-gui_local_debian_jessie-local_debian_jessie" for a paricularly advanced use case, involving X11 GUI applications with fileparameter translation.
+Docker base/image/container management infrastructure, intended for standalone applications. See "gui" for a paricularly advanced use case, involving X11 GUI applications with fileparameter translation.
 
 # Usage
 
@@ -10,14 +10,19 @@ Docker base/image/container management infrastructure, intended for standalone a
 cd ./dockerfiles/unimportant-hello-scratch
 ./anchor _setup
 ./anchor
-./anchor /hello
+./anchor _run /hello
 cd ..
 
-cd ./dockerfiles/unimportant-gui_local_debian_jessie-local_debian_jessie
-./anchor _run /bin/bash ./test/testfile ./test/testfile
+cd ./dockerfiles/gui
+./anchor ./test/testfile ./test/testfile
 #Should see xeyes launched from the script in the "./test" directory automatically shared with the container.
 cd ..
 ```
+
+# Dependencies
+
+Base image creation requires "mkimage.sh" script. Simply clone docker to a neighboring, or higher up, directory.
+git@github.com:docker/docker.git
 
 # Design
 

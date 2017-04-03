@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+export objectName="unimportant-local/gui:gui-local/debian:jessie"
+
+_deriveBaseImageContainerNames
+
+_enter() {
+	_run "$@"
+	#_run /bin/bash "$@"
+}
+
+
+
+
+

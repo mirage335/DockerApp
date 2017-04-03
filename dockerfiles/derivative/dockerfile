@@ -1,7 +1,6 @@
 # https://denibertovic.com/posts/handling-permissions-with-docker-volumes/
 
-#FROM local/debian:jessie
-FROM gui:local_debian_jessie
+FROM local/gui:gui
 
 RUN apt-get update && apt-get -y --no-install-recommends install \
     ca-certificates \

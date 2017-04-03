@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-export objectName="unimportant-gui:local_debian_jessie-local/debian:jessie"
+export objectName="unimportant-local/derivative:derivative-local/gui:gui"
 
 _deriveBaseImageContainerNames
+
 
 _enter() {
 	_run "$@"
