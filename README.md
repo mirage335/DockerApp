@@ -6,13 +6,11 @@ Docker base/image/container management infrastructure, intended for standalone a
 
 # Purpose
 
-When you install an application that depends on many libraries, those libraries
-are copied onto the system as dependencies for the application. They potentially
-conflict with other libraries from other applications.
+Applications often depend on conflicting libraries or configuration files. Notable examples include Firefox (~/.mozilla) and Arduino (~/.Arduino).
  
-Docker solves this problem for applications that run on the command-line.
+Docker solves this problem for command-line applications that use their own data.
  
-DockerApp solves this problem for applications that have a GUI (X11) user interface.
+DockerApp solves this problem for applications that have a GUI (X11) user interface, and read/modify/execute random files (eg. ~/Downloads ./sketch/sketch.ino).
 
 # Usage
 
