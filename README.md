@@ -6,11 +6,11 @@ Docker base/image/container management infrastructure, intended for standalone a
 
 # Purpose
 
-Applications often depend on conflicting libraries or configuration files. Notable examples include Firefox (~/.mozilla) and Arduino (~/.Arduino).
+Applications often depend on conflicting libraries or configuration files. Notable examples include Firefox ($HOME/.mozilla) and Arduino ($HOME/.Arduino).
  
 Docker solves this problem for command-line applications that use their own data.
  
-DockerApp solves this problem for applications that have a GUI (X11) user interface, and read/modify/execute random files (eg. ~/Downloads ./sketch/sketch.ino).
+DockerApp solves this problem for applications that have a GUI (X11) user interface, and read/modify/execute random files (eg. $HOME/Downloads ./sketch/sketch.ino).
 
 # Usage
 
