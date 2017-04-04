@@ -4,6 +4,16 @@ See license.txt for DockerApp license conditions.
 
 Docker base/image/container management infrastructure, intended for standalone applications. See "gui" for a paricularly advanced use case, involving X11 GUI applications with fileparameter translation.
 
+# Purpose
+
+When you install an application that depends on many libraries, those libraries
+are copied onto the system as dependencies for the application. They potentially
+conflict with other libraries from other applications.
+ 
+Docker solves this problem for applications that run on the command-line.
+ 
+DockerApp solves this problem for applications that have a GUI (X11) user interface.
+
 # Usage
 
 ```
