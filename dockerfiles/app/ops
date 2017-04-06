@@ -5,7 +5,7 @@ export objectName="unimportant-local/app:app-local/debian:jessie"
 _deriveBaseImageContainerNames
 
 _runExec() {
-	docker run -it --name "$containerObjectName"_"$sessionid" --cap-add SYS_ADMIN --device /dev/fuse --security-opt apparmor:unconfined -e localPWD="$localPWD" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$objectDir"/exec:/opt/exec -v "$HOME"/Downloads:/home/user/Downloads:rw -v "$sharedHostProjectDir":"$sharedGuestProjectDir":rw "$imageObjectName" /opt/exec/LibreOffice-5.3.0-x86_64.AppImage "$@"
+	docker run -i --name "$containerObjectName"_"$sessionid" --cap-add SYS_ADMIN --device /dev/fuse --security-opt apparmor:unconfined -e localPWD="$localPWD" -e LOCAL_USER_ID=`id -u $USER` --rm -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK:rw -v $XAUTH:$XAUTH:rw -e "XAUTHORITY=${XAUTH}" -v "$objectDir"/exec:/opt/exec -v "$HOME"/Downloads:/home/user/Downloads:rw -v "$sharedHostProjectDir":"$sharedGuestProjectDir":rw "$imageObjectName" /opt/exec/LibreOffice-5.3.0-x86_64.AppImage "$@"
 }
 
 _enter() {
