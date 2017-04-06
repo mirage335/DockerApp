@@ -12,6 +12,9 @@ Docker solves this problem for command-line applications that use their own data
  
 DockerApp solves this problem for applications that have a GUI (X11) user interface, and read/modify/execute random files (eg. $HOME/Downloads ./sketch/sketch.ino).
 
+# Installation
+Run/setup the "gui" DockerApp to install "dexe" to ~/bin .
+
 # Usage
 
 ```

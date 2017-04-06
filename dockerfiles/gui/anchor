@@ -30,6 +30,8 @@ _getScriptAbsoluteFolder() {
 
 ##### Script Call
 
+ln -s "$(_getScriptAbsoluteLocation)" ~/bin/dexe >/dev/null 2>&1
+
 . "$(_getScriptAbsoluteFolder)"/../../launch "$@"
 _main "$@"
 
